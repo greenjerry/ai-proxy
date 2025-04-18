@@ -3,8 +3,8 @@ import { cors } from "hono/cors"
 import { zValidator } from "@hono/zod-validator"
 import { z } from "zod"
 import { logger } from "hono/logger"
-import { proxy } from 'hono/proxy'
-
+import { proxy } from "hono/proxy"
+import { streamHandle } from "hono/aws-lambda"
 
 const app = new Hono()
 
@@ -129,8 +129,8 @@ app.use(async (c, next) => {
     if (proxy.pathSegment === "anthropic") {
       headers.delete("origin")
     }
-    headers.delete('content-length')
-    headers.delete('host')
+    headers.delete("content-length")
+    headers.delete("host")
 
     const res = await fetchWithTimeout(
       `${proxy.target}${url.pathname.replace(
@@ -154,4 +154,6 @@ app.use(async (c, next) => {
   next()
 })
 
+// export default app
+export const handler = streamHandle(app)
 export default app
